@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Try to Buy!</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        #product {
+            position: absolute;
+            width: 200px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        #product img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+
+        }
+
+        .buy-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .price {
+            color: #2196F3;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        #message {
+            position: fixed;
+            top: 20px;
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="message">Try to click the buy button... if you can! 😈</div>
+    <div id="product">
+        <img src="cat.png" alt="Product Image">
+        <h2>Amazing Product</h2>
+        <p class="price">$99.99</p>
+        <button class="buy-button">Buy Now!</button>
+    </div>
+
+    <script>
+        const product = document.getElementById('product');
+        let isMoving = false;
+
+        // Initial position
+        let x = window.innerWidth / 2 - 100;
+        let y = window.innerHeight / 2 - 100;
+        product.style.left = x + 'px';
+        product.style.top = y + 'px';
+
+        function getRandomPosition(distance) {
+            // The closer the cursor, the further the product can move
+            const maxDistance = Math.min(300 + (300 - distance) * 2, 800);
+            const angle = Math.random() * Math.PI * 2;
+            
+            // Calculate new position based on angle and distance
+            const moveX = Math.cos(angle) * maxDistance;
+            const moveY = Math.sin(angle) * maxDistance;
+            
+            // Get current position
+            const productRect = product.getBoundingClientRect();
+            let newX = productRect.left + moveX;
+            let newY = productRect.top + moveY;
+            
+            // Keep product within bounds
+            newX = Math.max(0, Math.min(newX, window.innerWidth - 240));
+            newY = Math.max(0, Math.min(newY, window.innerHeight - 340));
+            
+            return { x: newX, y: newY };
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            
+            const productRect = product.getBoundingClientRect();
+            const productCenterX = productRect.left + productRect.width / 2;
+            const productCenterY = productRect.top + productRect.height / 2;
+            
+            const distance = Math.sqrt(
+                Math.pow(mouseX - productCenterX, 2) + 
+                Math.pow(mouseY - productCenterY, 2)
+            );
+
+            // Different detection ranges for different behaviors
+            const maxRange = 300;
+            
+            if (distance < maxRange && !isMoving) {
+                isMoving = true;
+                
+                // Calculate speed based on distance (faster when closer)
+                const speed = Math.max(0.1, (maxRange - distance) / maxRange);
+                product.style.transition = `all ${0.3 - speed * 0.2}s ease`; // Faster transition when closer
+                
+                // Get new position
+                const newPos = getRandomPosition(distance);
+                
+                // Apply new position
+                product.style.left = newPos.x + 'px';
+                product.style.top = newPos.y + 'px';
+                
+                // Reset isMoving after transition
+                setTimeout(() => {
+                    isMoving = false;
+                }, (0.3 - speed * 0.2) * 1000);
+
+                // Add some random rotation for fun when very close
+                if (distance < 100) {
+                    const rotation = (Math.random() - 0.5) * 90; // Random rotation between -45 and 45 degrees
+                    product.style.transform = `rotate(${rotation}deg)`;
+                } else {
+                    product.style.transform = 'rotate(0deg)';
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            x = Math.min(x, window.innerWidth - 240);
+            y = Math.min(y, window.innerHeight - 340);
+            product.style.left = x + 'px';
+            product.style.top = y + 'px';
+        });
+    </script>
+</body>
+</html>
