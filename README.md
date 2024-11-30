@@ -2,7 +2,7 @@ Can you click that button
 
 Features 
 
-.Container moves to a different as soon as you move your cursor over it.
+.Container moves to a different spot as soon as you move your cursor over it.
 
 Disclaimer-
 
